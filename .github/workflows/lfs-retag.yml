@@ -1,4 +1,4 @@
-name: Create source tarball
+name: Rename tags to a better name
 
 on:
   push:
