@@ -1,0 +1,41 @@
+name: Create source tarball
+
+on:
+  schedule:
+  - cron:  "30 0,12 * * *"
+  workflow_dispatch:
+
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+    - name: repo-sync
+      uses: repo-sync/github-sync@v2
+      with:
+        source_repo: "https://github.com/xkbcommon/libxkbcommon"
+        source_branch: "master"
+        destination_branch: "master"
+        sync_tags: "true"
+        github_token: ${{ secrets.PAT }}
+  retag:
+    needs: repo-sync
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: master
+        fetch-depth: 0
+    - name: Rename tags
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        for bad_name in $(git tag | grep ^xkbcommon-); do
+          good_name=v${i#xkbcommon-}
+          if ! git tag | grep -q $new_tag; then
+            git tag $good_name $bad_name
+          fi
+        done
+        git push --tags
