@@ -22,7 +22,7 @@ jobs:
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git fetch --tags https://github.com/xkbcommon/libxkbcommon
         for bad_name in $(git tag | grep ^xkbcommon-); do
-          good_name=v${i#xkbcommon-}
+          good_name=v${bad_name#xkbcommon-}
           if ! git tag | grep -q $new_tag; then
             git tag $good_name $bad_name
           fi
