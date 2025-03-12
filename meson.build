@@ -1,7 +1,7 @@
 project(
     'libxkbcommon',
     'c',
-    version: '1.8.0',
+    version: '1.8.1',
     default_options: [
         'c_std=c11',
         'warning_level=3',
@@ -381,12 +381,21 @@ endif
 # libxkbregistry
 if get_option('enable-xkbregistry')
     dep_libxml = dependency('libxml-2.0')
+    # Since libxml-2.13
     if cc.has_header_symbol(
-        'libxml/xmlerror.h',
+        'libxml/parser.h',
         'xmlCtxtSetErrorHandler',
-        prefix: system_ext_define
+        prefix: system_ext_define,
     )
         configh_data.set10('HAVE_XML_CTXT_SET_ERRORHANDLER', true)
+    endif
+    # Since libxml-2.14
+    if cc.has_header_symbol(
+        'libxml/parser.h',
+        'xmlCtxtParseDtd',
+        prefix: system_ext_define,
+    )
+        configh_data.set10('HAVE_XML_CTXT_PARSE_DTD', true)
     endif
     deps_libxkbregistry = [dep_libxml]
     libxkbregistry_sources = [
